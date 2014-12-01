@@ -1,5 +1,5 @@
 -- Create an empty "master table"; this serves to define the schema
-CREATE TABLE  IF NOT EXISTS hyfn8_metrics_metrics (id SERIAL, name varchar, period varchar, key varchar, value_key varchar, value int, recorded_at timestamp, created_at timestamp, updated_at timestamp, PRIMARY KEY (id));
+CREATE TABLE  IF NOT EXISTS hyfn8_metrics_metrics (id SERIAL, name varchar, period varchar, key varchar, value_key varchar, value int, recorded_at timestamp, PRIMARY KEY (id));
 -- CREATE TABLE IF NOT EXISTS metrics (LIKE hyfn8_metrics_metrics);
 
 -- Create two tables with constraints that "inherit" from the master table;
@@ -44,8 +44,10 @@ CREATE TABLE IF NOT EXISTS metrics_201412 (CHECK (year_month_str(recorded_at)='2
 
 CREATE OR REPLACE FUNCTION metrics_datetime_table_insert_trigger()
 RETURNS TRIGGER AS $$
+DECLARE
+  partition_table_name text := quote_ident('metrics_' || year_month_str(NEW.recorded_at));
 BEGIN
-  EXECUTE format('INSERT INTO (SELECT %I VALUES (NEW.*);', ('metrics_' || year_month_str(NEW.datetime)));
+  EXECUTE 'INSERT INTO ' || partition_table_name || ' VALUES (NEW.*)';
   RETURN null;
 END
 $$
