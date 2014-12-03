@@ -18,36 +18,39 @@ $$
 LANGUAGE SQL;
 
 
-CREATE TABLE IF NOT EXISTS metrics_201401 (CHECK (year_month_str(recorded_at)='201401')) INHERITS(hyfn8_metrics_metrics);
-CREATE TABLE IF NOT EXISTS metrics_201402 (CHECK (year_month_str(recorded_at)='201402')) INHERITS(hyfn8_metrics_metrics);
-CREATE TABLE IF NOT EXISTS metrics_201403 (CHECK (year_month_str(recorded_at)='201403')) INHERITS(hyfn8_metrics_metrics);
-CREATE TABLE IF NOT EXISTS metrics_201404 (CHECK (year_month_str(recorded_at)='201404')) INHERITS(hyfn8_metrics_metrics);
-CREATE TABLE IF NOT EXISTS metrics_201405 (CHECK (year_month_str(recorded_at)='201405')) INHERITS(hyfn8_metrics_metrics);
-CREATE TABLE IF NOT EXISTS metrics_201406 (CHECK (year_month_str(recorded_at)='201406')) INHERITS(hyfn8_metrics_metrics);
-CREATE TABLE IF NOT EXISTS metrics_201407 (CHECK (year_month_str(recorded_at)='201407')) INHERITS(hyfn8_metrics_metrics);
-CREATE TABLE IF NOT EXISTS metrics_201408 (CHECK (year_month_str(recorded_at)='201408')) INHERITS(hyfn8_metrics_metrics);
-CREATE TABLE IF NOT EXISTS metrics_201409 (CHECK (year_month_str(recorded_at)='201409')) INHERITS(hyfn8_metrics_metrics);
-CREATE TABLE IF NOT EXISTS metrics_201410 (CHECK (year_month_str(recorded_at)='201410')) INHERITS(hyfn8_metrics_metrics);
-CREATE TABLE IF NOT EXISTS metrics_201411 (CHECK (year_month_str(recorded_at)='201411')) INHERITS(hyfn8_metrics_metrics);
-CREATE TABLE IF NOT EXISTS metrics_201412 (CHECK (year_month_str(recorded_at)='201412')) INHERITS(hyfn8_metrics_metrics);
+CREATE TABLE IF NOT EXISTS metrics_201401 (CHECK (recorded_at >= DATE '2014-01-01' AND recorded_at < DATE '2014-02-01')) INHERITS(hyfn8_metrics_metrics);
+CREATE TABLE IF NOT EXISTS metrics_201402 (CHECK (recorded_at >= DATE '2014-02-01' AND recorded_at < DATE '2014-03-01')) INHERITS(hyfn8_metrics_metrics);
+CREATE TABLE IF NOT EXISTS metrics_201403 (CHECK (recorded_at >= DATE '2014-03-01' AND recorded_at < DATE '2014-04-01')) INHERITS(hyfn8_metrics_metrics);
+CREATE TABLE IF NOT EXISTS metrics_201404 (CHECK (recorded_at >= DATE '2014-04-01' AND recorded_at < DATE '2014-05-01')) INHERITS(hyfn8_metrics_metrics);
+CREATE TABLE IF NOT EXISTS metrics_201405 (CHECK (recorded_at >= DATE '2014-05-01' AND recorded_at < DATE '2014-06-01')) INHERITS(hyfn8_metrics_metrics);
+CREATE TABLE IF NOT EXISTS metrics_201406 (CHECK (recorded_at >= DATE '2014-06-01' AND recorded_at < DATE '2014-07-01')) INHERITS(hyfn8_metrics_metrics);
+CREATE TABLE IF NOT EXISTS metrics_201407 (CHECK (recorded_at >= DATE '2014-07-01' AND recorded_at < DATE '2014-08-01')) INHERITS(hyfn8_metrics_metrics);
+CREATE TABLE IF NOT EXISTS metrics_201408 (CHECK (recorded_at >= DATE '2014-08-01' AND recorded_at < DATE '2014-09-01')) INHERITS(hyfn8_metrics_metrics);
+CREATE TABLE IF NOT EXISTS metrics_201409 (CHECK (recorded_at >= DATE '2014-09-01' AND recorded_at < DATE '2014-10-01')) INHERITS(hyfn8_metrics_metrics);
+CREATE TABLE IF NOT EXISTS metrics_201410 (CHECK (recorded_at >= DATE '2014-10-01' AND recorded_at < DATE '2014-11-01')) INHERITS(hyfn8_metrics_metrics);
+CREATE TABLE IF NOT EXISTS metrics_201411 (CHECK (recorded_at >= DATE '2014-11-01' AND recorded_at < DATE '2014-12-01')) INHERITS(hyfn8_metrics_metrics);
+CREATE TABLE IF NOT EXISTS metrics_201412 (CHECK (recorded_at >= DATE '2014-12-01' AND recorded_at < DATE '2015-01-01')) INHERITS(hyfn8_metrics_metrics);
 
 -- Add some indexes; these can be different for each table
--- CREATE INDEX index_recorded_at_and_key_and_name_on_10_min ON metrics_10_minutes (recorded_at, key, name);
--- CREATE INDEX index_recorded_at_and_key_and_name_on_7_days ON metrics_7_days (recorded_at, key, name);
--- CREATE INDEX index_recorded_at_and_key_and_name_on_28_days ON metrics_28_days (recorded_at, key, name);
--- CREATE INDEX index_recorded_at_and_key_and_name_on_1_days ON metrics_1_days (recorded_at, key, name);
--- CREATE INDEX index_recorded_at_and_key_and_name_on_lifetime ON metrics_lifetime (recorded_at, key, name);
-
--- CREATE INDEX index_period_recorded_at_key_name_on_metrics ON metrics (period, recorded_at, key, name);
--- CREATE INDEX index_value_key_on_metrics ON metrics (value_key);
--- CREATE INDEX index_recorded_at_on_metrics ON metrics (recorded_at);
+CREATE INDEX index_recorded_at_and_key_and_name_on_metrics_201401 ON metrics_201401 (recorded_at, key, name);
+CREATE INDEX index_recorded_at_and_key_and_name_on_metrics_201402 ON metrics_201402 (recorded_at, key, name);
+CREATE INDEX index_recorded_at_and_key_and_name_on_metrics_201403 ON metrics_201403 (recorded_at, key, name);
+CREATE INDEX index_recorded_at_and_key_and_name_on_metrics_201404 ON metrics_201404 (recorded_at, key, name);
+CREATE INDEX index_recorded_at_and_key_and_name_on_metrics_201405 ON metrics_201405 (recorded_at, key, name);
+CREATE INDEX index_recorded_at_and_key_and_name_on_metrics_201406 ON metrics_201406 (recorded_at, key, name);
+CREATE INDEX index_recorded_at_and_key_and_name_on_metrics_201407 ON metrics_201407 (recorded_at, key, name);
+CREATE INDEX index_recorded_at_and_key_and_name_on_metrics_201408 ON metrics_201408 (recorded_at, key, name);
+CREATE INDEX index_recorded_at_and_key_and_name_on_metrics_201409 ON metrics_201409 (recorded_at, key, name);
+CREATE INDEX index_recorded_at_and_key_and_name_on_metrics_201410 ON metrics_201410 (recorded_at, key, name);
+CREATE INDEX index_recorded_at_and_key_and_name_on_metrics_201411 ON metrics_201411 (recorded_at, key, name);
+CREATE INDEX index_recorded_at_and_key_and_name_on_metrics_201412 ON metrics_201412 (recorded_at, key, name);
 
 CREATE OR REPLACE FUNCTION metrics_datetime_table_insert_trigger()
 RETURNS TRIGGER AS $$
 DECLARE
   partition_table_name text := quote_ident('metrics_' || year_month_str(NEW.recorded_at));
 BEGIN
-  EXECUTE 'INSERT INTO ' || partition_table_name || ' VALUES (NEW.*)';
+  EXECUTE 'INSERT INTO ' || partition_table_name || ' VALUES ($1, $2, $3, $4, $5, $6, $7)' USING NEW.id, NEW.name, NEW.period, NEW.key, NEW.value_key, NEW.value, NEW.recorded_at;
   RETURN null;
 END
 $$
